@@ -4,7 +4,7 @@ const { ERROR_NOT_FOUND, ERROR_BAD_REQ, ERROR_SERVER } = require('../utils/error
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -13,19 +13,31 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => res.send(card))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+      }
+    });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
         return;
       }
       res.send(card);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+      }
+    });
 };
 
 module.exports.likeCard = (req, res) => {
@@ -36,12 +48,18 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
         return;
       }
       res.send(card);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+      }
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -52,10 +70,16 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(500).send({ message: 'Произошла ошибка' });
+        res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
         return;
       }
       res.send(card);
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+      } else {
+        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+      }
+    });
 };
