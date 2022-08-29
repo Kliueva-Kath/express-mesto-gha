@@ -1,6 +1,5 @@
 {
   "name": "express-mesto-gha",
-  "author": "Katherine Kliueva",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
