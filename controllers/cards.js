@@ -1,13 +1,16 @@
 const Card = require('../models/card');
-const { ERROR_NOT_FOUND, ERROR_BAD_REQ, ERROR_SERVER } = require('../utils/errors');
+const BadRequestError = require('../errors/bad-req-err');
+const NotFoundError = require('../errors/not-found-err');
+const ServerError = require('../errors/server-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' }));
+    .catch(() => next(new ServerError('Внутренняя ошибка сервера')));
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
 
@@ -15,32 +18,36 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+        throw new ServerError('Внутренняя ошибка сервера');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
-        return;
+        throw new NotFoundError('Запрашиваемая карточка не найдена');
+      }
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('У вас нет прав на удаление этой карточки');
       }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+        throw new ServerError('Внутренняя ошибка сервера');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -48,21 +55,21 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
-        return;
+        throw new NotFoundError('Запрашиваемая карточка не найдена');
       }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+        throw new ServerError('Внутренняя ошибка сервера');
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -70,16 +77,16 @@ module.exports.dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'Запрашиваемая карточка не найдена' });
-        return;
+        throw new NotFoundError('Запрашиваемая карточка не найдена');
       }
       res.send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQ).send({ message: 'Переданы некорректные данные' });
+        throw new BadRequestError('Переданы некорректные данные');
       } else {
-        res.status(ERROR_SERVER).send({ message: 'Внутренняя ошибка сервера' });
+        throw new ServerError('Внутренняя ошибка сервера');
       }
-    });
+    })
+    .catch(next);
 };
