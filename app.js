@@ -12,12 +12,21 @@ const error = require('./middlewares/error');
 
 const { PORT = 3000 } = process.env;
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-});
-
 const app = express();
-app.listen(PORT);
+
+async function main() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/mestodb', {
+      useNewUrlParser: true,
+    });
+
+    await app.listen(PORT);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+main();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
