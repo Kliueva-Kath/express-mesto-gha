@@ -24,10 +24,11 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
+        return;
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.getMyUser = (req, res, next) => {
@@ -40,10 +41,11 @@ module.exports.getMyUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
+        return;
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -66,12 +68,15 @@ module.exports.createUser = (req, res, next) => {
         .then((user) => res.send(user))
         .catch((err) => {
           if (err.name === 'ValidationError') {
-            throw new BadRequestError('Переданы некорректные данные');
-          } else if (err.code === 11000) {
-            throw new ConflictError('Пользователь с таким email уже существует');
+            next(new BadRequestError('Переданы некорректные данные'));
+            return;
           }
-        })
-        .catch(next);
+          if (err.code === 11000) {
+            next(new ConflictError('Пользователь с таким email уже существует'));
+            return;
+          }
+          next(err);
+        });
     });
 };
 
@@ -87,10 +92,10 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -105,10 +110,10 @@ module.exports.updateAvatar = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError('Переданы некорректные данные');
+        next(new BadRequestError('Переданы некорректные данные'));
       }
-    })
-    .catch(next);
+      next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
