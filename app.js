@@ -7,8 +7,8 @@ const cookieParser = require('cookie-parser');
 const NotFoundError = require('./errors/not-found-err');
 
 const { login, createUser } = require('./controllers/users');
-const auth = require('./middlewares/auth');
-const error = require('./middlewares/error');
+const { auth } = require('./middlewares/auth');
+const { error } = require('./middlewares/error');
 
 const { PORT = 3000 } = process.env;
 

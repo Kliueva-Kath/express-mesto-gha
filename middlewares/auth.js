@@ -8,7 +8,8 @@ module.exports.auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
-    throw new AuthError('Произошла ошибка авторизации');
+    next(new AuthError('Произошла ошибка авторизации'));
+    return;
   }
 
   req.user = payload;
