@@ -65,7 +65,7 @@ module.exports.createUser = async (req, res, next) => {
       email,
       password: hash,
     });
-    res.send(newUser);
+    res.send(newUser.toJSON());
   } catch (err) {
     if (err.name === 'ValidationError') {
       next(new BadRequestError('Переданы некорректные данные'));
