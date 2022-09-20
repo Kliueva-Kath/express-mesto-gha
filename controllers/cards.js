@@ -1,13 +1,12 @@
 const Card = require('../models/card');
 const BadRequestError = require('../errors/bad-req-err');
 const NotFoundError = require('../errors/not-found-err');
-const ServerError = require('../errors/server-err');
 const ForbiddenError = require('../errors/forbidden-err');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch(() => next(new ServerError('Внутренняя ошибка сервера')));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -19,8 +18,6 @@ module.exports.createCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);
@@ -40,8 +37,6 @@ module.exports.deleteCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);
@@ -62,8 +57,6 @@ module.exports.likeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);
@@ -84,8 +77,6 @@ module.exports.dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);

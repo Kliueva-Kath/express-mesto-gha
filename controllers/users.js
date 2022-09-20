@@ -1,7 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const ServerError = require('../errors/server-err');
 const BadRequestError = require('../errors/bad-req-err');
 const AuthError = require('../errors/auth-err');
 const NotFoundError = require('../errors/not-found-err');
@@ -12,7 +11,7 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch(() => next(new ServerError('Внутренняя ошибка сервера')));
+    .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -26,8 +25,6 @@ module.exports.getUserById = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);
@@ -44,8 +41,6 @@ module.exports.getMyUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);
@@ -74,8 +69,6 @@ module.exports.createUser = (req, res, next) => {
             throw new BadRequestError('Переданы некорректные данные');
           } else if (err.code === 11000) {
             throw new ConflictError('Пользователь с таким email уже существует');
-          } else {
-            throw new ServerError('Внутренняя ошибка сервера');
           }
         })
         .catch(next);
@@ -95,8 +88,6 @@ module.exports.updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);
@@ -115,8 +106,6 @@ module.exports.updateAvatar = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные');
-      } else {
-        throw new ServerError('Внутренняя ошибка сервера');
       }
     })
     .catch(next);
