@@ -43,4 +43,10 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.methods.toJSON = function removePassword() {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
+
 module.exports = mongoose.model('user', userSchema);
