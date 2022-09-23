@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { urlRegExp } = require('../utils/regExp');
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -12,7 +13,7 @@ const cardSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
-        return /^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/.test(v);  //eslint-disable-line
+        return urlRegExp.test(v);
       },
       message: 'Ошибка в url-адресе',
     },
