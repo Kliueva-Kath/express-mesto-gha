@@ -10,6 +10,7 @@ const { login, createUser } = require('./controllers/users');
 const { auth } = require('./middlewares/auth');
 const { error } = require('./middlewares/error');
 const { urlRegExp } = require('./utils/regExp');
+const cors = require('./middlewares/cors');
 
 const { PORT = 3000 } = process.env;
 
@@ -32,6 +33,7 @@ main();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(cors);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
